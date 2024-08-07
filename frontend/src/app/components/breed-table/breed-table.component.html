@@ -1,0 +1,21 @@
+<div class="container">
+  <h2>Tabla de Razas de Gatos</h2>
+  <input type="text" class="form-control" [(ngModel)]="searchQuery" placeholder="Buscar raza...">
+  <button class="btn btn-primary" (click)="onSearch()">Buscar</button>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Origen</th>
+        <th>Descripción</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let breed of filteredBreeds">
+        <td>{{ breed.name }}</td>
+        <td>{{ breed.origin }}</td>
+        <td>{{ breed.description }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
