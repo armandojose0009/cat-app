@@ -9,6 +9,14 @@ services:
     volumes:
       - ~/mongo/data:/data/db
 
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - 6379:6379
+    networks:
+      - app
+
   api:
     build:
       context: ./backend
@@ -21,10 +29,13 @@ services:
       - ./backend:/opt/backend
     working_dir: /opt/backend
     environment:
-          - HOSTMONGO=mongo
-          - PORTMONGO=27017
-          - DATABASEMONGO=catapi
-          - API_KEY=live_JBT0Ah0Nt12iyl2IpjQVLDWjcLk0GQwf4zI9wBMfmfejKmcC31mOJp4yJz5TsOUP
+      - HOSTMONGO=mongo
+      - PORTMONGO=27017
+      - DATABASEMONGO=catapi
+      - API_KEY=live_JBT0Ah0Nt12iyl2IpjQVLDWjcLk0GQwf4zI9wBMfmfejKmcC31mOJp4yJz5TsOUP
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+
   app:
     build:
       context: ./frontend

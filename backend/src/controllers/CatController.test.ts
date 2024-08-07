@@ -2,12 +2,15 @@ import { Request, Response } from 'express';
 import sinon from 'sinon';
 import CatService from '../services/CatService';
 import CatController from './CatController';
+import RedisClient from '../config/redis';
 
 describe('CatController', () => {
   let req: Partial<Request>;
   let res: Partial<Response>;
   let json: sinon.SinonStub;
   let status: sinon.SinonStub;
+  let redisGetDataStub: sinon.SinonStub;
+  let redisSetDataStub: sinon.SinonStub;
 
   beforeEach(() => {
     req = {};
@@ -15,6 +18,9 @@ describe('CatController', () => {
       json: json = sinon.stub(),
       status: status = sinon.stub().returnsThis(),
     };
+    const redisClient = RedisClient.getInstance();
+    redisGetDataStub = sinon.stub(redisClient, 'getData');
+    redisSetDataStub = sinon.stub(redisClient, 'setData');
   });
 
   afterEach(() => {
@@ -22,12 +28,24 @@ describe('CatController', () => {
   });
 
   describe('getBreeds', () => {
-    it('should return breeds successfully', async () => {
+    it('should return breeds successfully with Redis', async () => {
       const breeds = [{ id: 1, name: 'Siamese' }];
       sinon.stub(CatService, 'getBreeds').resolves(breeds);
+      redisGetDataStub.resolves(JSON.stringify(breeds));
 
       await CatController.getBreeds(req as Request, res as Response);
       sinon.assert.calledWith(json, breeds);
+    });
+
+    it('should return breeds successfully without Redis', async () => {
+      const breeds = [{ id: 1, name: 'Siamese' }];
+      sinon.stub(CatService, 'getBreeds').resolves(breeds);
+      redisGetDataStub.resolves();
+      redisSetDataStub.resolves();
+
+      await CatController.getBreeds(req as Request, res as Response);
+      const jsonValue = (json as sinon.SinonStub).getCall(0).args[0];
+      expect(jsonValue).toEqual(breeds);
     });
 
     it('should handle errors', async () => {
@@ -41,14 +59,28 @@ describe('CatController', () => {
   });
 
   describe('getBreedById', () => {
-    it('should return breed by ID successfully', async () => {
+    it('should return breed by ID successfully with redis', async () => {
       const breed = { id: 1, name: 'Siamese' };
       req.params = { breed_id: '1' };
       sinon.stub(CatService, 'getBreedById').withArgs('1').resolves(breed);
+      redisGetDataStub.resolves(JSON.stringify(breed));
 
       await CatController.getBreedById(req as Request, res as Response);
 
       sinon.assert.calledWith(json, breed);
+    });
+
+    it('should return breed by ID successfully without redis', async () => {
+      const breed = { id: 1, name: 'Siamese' };
+      req.params = { breed_id: '1' };
+      sinon.stub(CatService, 'getBreedById').withArgs('1').resolves(breed);
+      redisGetDataStub.resolves();
+      redisSetDataStub.resolves();
+
+      await CatController.getBreedById(req as Request, res as Response);
+
+      const jsonValue = (json as sinon.SinonStub).getCall(0).args[0];
+      expect(jsonValue).toEqual(breed);
     });
 
     it('should handle errors', async () => {
@@ -63,14 +95,28 @@ describe('CatController', () => {
   });
 
   describe('searchBreeds', () => {
-    it('should return searched breeds successfully', async () => {
+    it('should return searched breeds successfully with redis', async () => {
       const breeds = [{ id: 1, name: 'Siamese' }];
       req.query = { q: 'Siamese' };
       sinon.stub(CatService, 'searchBreeds').withArgs('Siamese').resolves(breeds);
+      redisGetDataStub.resolves(JSON.stringify(breeds));
 
       await CatController.searchBreeds(req as Request, res as Response);
 
       sinon.assert.calledWith(json, breeds);
+    });
+
+    it('should return searched breeds successfully without redis', async () => {
+      const breeds = [{ id: 1, name: 'Siamese' }];
+      req.query = { q: 'Siamese' };
+      sinon.stub(CatService, 'searchBreeds').withArgs('Siamese').resolves(breeds);
+      redisGetDataStub.resolves();
+      redisSetDataStub.resolves();
+
+      await CatController.searchBreeds(req as Request, res as Response);
+
+      const jsonValue = (json as sinon.SinonStub).getCall(0).args[0];
+      expect(jsonValue).toEqual(breeds);
     });
 
     it('should handle errors', async () => {

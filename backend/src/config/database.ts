@@ -11,9 +11,9 @@ interface MongoDbSettings {
 
 class Database {
   private static mongoDbSettings: MongoDbSettings = {
-    host: process.env.HOSTMONGO || 'localhost',
-    port: parseInt(process.env.PORTMONGO || '27017', 10),
-    database: process.env.DATABASEMONGO || 'catapi',
+    host: process.env.HOSTMONGO || '',
+    port: parseInt(process.env.PORTMONGO || '', 10),
+    database: process.env.DATABASEMONGO || '',
   };
 
   private static mongoUri = `mongodb://${Database.mongoDbSettings.host}:${Database.mongoDbSettings.port}/${Database.mongoDbSettings.database}`;

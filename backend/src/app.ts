@@ -3,6 +3,7 @@ import catRoutes from './routes/catRoutes';
 import imageRoutes from './routes/imageRoutes';
 import userRoutes from './routes/userRoutes';
 import Database from './config/database';
+import Redis from './config/redis';
 
 const app = express();
 app.use(express.json());
@@ -14,6 +15,8 @@ app.use('/api/users', userRoutes);
 const startServer = async () => {
   try {
     await Database.connect();
+    const redisClient = Redis.getInstance();
+    await redisClient.connect();
     app.listen(3001, () => {
       console.log(`Server running on http://localhost:3001`);
     });
