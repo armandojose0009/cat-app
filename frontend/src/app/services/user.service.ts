@@ -1,28 +1,30 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import axios, { AxiosInstance } from 'axios';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
   private baseUrl = 'https://localhost:3001/api/users';
+  private axiosInstance: AxiosInstance;
   private loggedIn = false; // Variable to manage authentication state
   private user: any; // Property to store user data
 
-  constructor(private http: HttpClient) { }
-
-  register(user: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/register`, user);
+  constructor() {
+    this.axiosInstance = axios.create({
+      baseURL: this.baseUrl
+    });
   }
 
-  login(credentials: any): Observable<any> {
-    return this.http.post(`${this.baseUrl}/login`, credentials).pipe(
-      tap((response: any) => {
-        this.loggedIn = true;
-        this.user = response.user; // Store user data after login
-      })
-    );
+  async register(user: any): Promise<any> {
+    return this.axiosInstance.post('/register', user);
+  }
+
+  async login(credentials: any): Promise<any> {
+    const response = await this.axiosInstance.post('/login', credentials);
+    this.loggedIn = true;
+    this.user = response.data.user; // Store user data after login
+    return response;
   }
 
   isLoggedIn(): boolean {

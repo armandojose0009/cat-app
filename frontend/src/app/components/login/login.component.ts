@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
-import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-login',
@@ -13,16 +13,19 @@ export class LoginComponent {
 
   constructor(private userService: UserService, private router: Router, private fb: FormBuilder) {
     this.loginForm = this.fb.group({
-      username: ['', Validators.required],
-      password: ['', Validators.required]
+      username: [''],
+      password: ['']
     });
   }
 
-  onLogin(): void {
+  async onLogin(): Promise<void> {
     if (this.loginForm.valid) {
-      this.userService.login(this.loginForm.value).subscribe(() => {
+      try {
+        await this.userService.login(this.loginForm.value);
         this.router.navigate(['/protected']);
-      });
+      } catch (error) {
+        console.error('Login failed:', error);
+      }
     }
   }
 }

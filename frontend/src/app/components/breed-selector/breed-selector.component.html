@@ -1,8 +1,13 @@
 <div class="container">
   <h2>Selecciona una raza de gato</h2>
-  <select class="form-select" (change)="onSelectBreed($event)">
-    <option *ngFor="let breed of breeds" [value]="breed.id">{{ breed.name }}</option>
-  </select>
+  <mat-form-field appearance="fill">
+    <mat-label>Breed</mat-label>
+    <mat-select (selectionChange)="onSelectBreed($event.value)">
+      <mat-option *ngFor="let breed of breeds" [value]="breed.id">
+        {{ breed.name }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
 
   <app-breed-carousel *ngIf="selectedBreed" [breed]="selectedBreed"></app-breed-carousel>
 </div>

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { UserService } from '../../services/user.service';
 import { Router } from '@angular/router';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-register',
@@ -10,20 +10,50 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 })
 export class RegisterComponent {
   registerForm: FormGroup;
+  fields = [
+    {
+      key: 'username',
+      type: 'input',
+      templateOptions: {
+        label: 'Username',
+        placeholder: 'Enter your username',
+        required: true
+      }
+    },
+    {
+      key: 'password',
+      type: 'input',
+      templateOptions: {
+        type: 'password',
+        label: 'Password',
+        placeholder: 'Enter your password',
+        required: true
+      }
+    },
+    {
+      key: 'email',
+      type: 'input',
+      templateOptions: {
+        type: 'email',
+        label: 'Email',
+        placeholder: 'Enter your email',
+        required: true
+      }
+    }
+  ];
 
   constructor(private userService: UserService, private router: Router, private fb: FormBuilder) {
-    this.registerForm = this.fb.group({
-      username: ['', Validators.required],
-      password: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]]
-    });
+    this.registerForm = this.fb.group({});
   }
 
-  onRegister(): void {
+  async onRegister(): Promise<void> {
     if (this.registerForm.valid) {
-      this.userService.register(this.registerForm.value).subscribe(() => {
+      try {
+        await this.userService.register(this.registerForm.value);
         this.router.navigate(['/login']);
-      });
+      } catch (error) {
+        console.error('Registration failed:', error);
+      }
     }
   }
 }

@@ -10,20 +10,23 @@ export class BreedSelectorComponent implements OnInit {
   breeds: any[] = [];
   selectedBreed: any = null;
 
-  constructor(private catService: CatService) { }
+  constructor(private catService: CatService) {}
 
-  ngOnInit(): void {
-    this.catService.getBreeds().subscribe((data: any) => {
-      this.breeds = data;
-    });
+  async ngOnInit(): Promise<void> {
+    try {
+      const response = await this.catService.getBreeds();
+      this.breeds = response.data;
+    } catch (error) {
+      console.error('Error fetching breeds:', error);
+    }
   }
 
-  onSelectBreed(event: Event): void {
-    const target = event.target as HTMLSelectElement;
-    const breedId = target.value;
-    this.catService.getBreedById(breedId).subscribe((data: any) => {
-      this.selectedBreed = data;
-    });
+  async onSelectBreed(breedId: string): Promise<void> {
+    try {
+      const response = await this.catService.getBreedById(breedId);
+      this.selectedBreed = response.data;
+    } catch (error) {
+      console.error('Error fetching breed details:', error);
+    }
   }
-
 }

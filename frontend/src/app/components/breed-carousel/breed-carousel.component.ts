@@ -10,11 +10,16 @@ export class BreedCarouselComponent implements OnInit {
   @Input() breed: any;
   images: any[] = [];
 
-  constructor(private catService: CatService) { }
+  constructor(private catService: CatService) {}
 
-  ngOnInit(): void {
-    this.catService.getImagesByBreedId(this.breed.id).subscribe((data: any) => {
-      this.images = data;
-    });
+  async ngOnInit(): Promise<void> {
+    if (this.breed && this.breed.id) {
+      try {
+        const response = await this.catService.getImagesByBreedId(this.breed.id);
+        this.images = response.data;
+      } catch (error) {
+        console.error('Error fetching images:', error);
+      }
+    }
   }
 }

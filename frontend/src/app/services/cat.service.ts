@@ -1,28 +1,32 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import axios, { AxiosInstance } from 'axios';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CatService {
   private baseUrl = 'https://localhost:3001/api/cats';
+  private axiosInstance: AxiosInstance;
 
-  constructor(private http: HttpClient) { }
-
-  getBreeds(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/breeds`);
+  constructor() {
+    this.axiosInstance = axios.create({
+      baseURL: this.baseUrl
+    });
   }
 
-  getBreedById(breedId: string): Observable<any> {
-    return this.http.get(`${this.baseUrl}/breeds/${breedId}`);
+  async getBreeds(): Promise<any> {
+    return this.axiosInstance.get('/breeds');
   }
 
-  searchBreeds(query: string): Observable<any> {
-    return this.http.get(`${this.baseUrl}/breeds/search`, { params: { q: query } });
+  async getBreedById(breedId: string): Promise<any> {
+    return this.axiosInstance.get(`/breeds/${breedId}`);
   }
 
-  getImagesByBreedId(breedId: string): Observable<any> {
-    return this.http.get(`${this.baseUrl}/image/imagesbybreedid`, { params: { breed_id: breedId } });
+  async searchBreeds(query: string): Promise<any> {
+    return this.axiosInstance.get('/breeds/search', { params: { q: query } });
+  }
+
+  async getImagesByBreedId(breedId: string): Promise<any> {
+    return this.axiosInstance.get('/image/imagesbybreedid', { params: { breed_id: breedId } });
   }
 }
