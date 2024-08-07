@@ -1,0 +1,44 @@
+services:
+  mongo:
+    image: mongo
+    container_name: mongo
+    ports:
+      - 27017:27017
+    networks:
+      - app
+    volumes:
+      - ~/mongo/data:/data/db
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    networks:
+      - app
+    volumes:
+      - ./backend:/opt/backend
+    working_dir: /opt/backend
+    environment:
+          - HOSTMONGO=mongo
+          - PORTMONGO=27017
+          - DATABASEMONGO=catapi
+          - API_KEY=live_JBT0Ah0Nt12iyl2IpjQVLDWjcLk0GQwf4zI9wBMfmfejKmcC31mOJp4yJz5TsOUP
+  app:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    networks:
+      - app
+    volumes:
+      - ./frontend:/opt/frontend
+    working_dir: /opt/frontend
+
+networks:
+  app:
+    driver: "bridge"
